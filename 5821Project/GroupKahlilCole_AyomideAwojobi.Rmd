@@ -1,0 +1,159 @@
+---
+title: "CS5821 Project"
+author: "Kahlil Cole, Ayomide Awojobi"
+date: "April 13, 2021"
+output: word_document
+---
+
+```{r }
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+
+
+
+# Reading dataset into R
+dataset <- read.csv("Occupational_Employment_and_Wage_Estimates.csv", stringsAsFactors=T)
+
+# number of observations in dataset
+dim(dataset) # there are 6563 observations in the dataset
+
+# Remove missing values from dataset
+newdata <- na.omit(dataset)
+
+# number of observations in newdata
+dim(newdata) # there are now 5473 observations in the newdata. 1090 observations
+# of missing values were removed
+
+# Show column names of newdata
+names(newdata) #ID is the number of observations, year is 2020.
+# Occupaiton title shows the type of occupation in the area, employment shows the number
+# of people employed to the particular occupation in the year 2020. Average wage shows the
+# average pay per hour for the occupation in the year 2020. Annual wage shows to yearly pay
+# for the occupation in that year.
+
+# Area names
+
+levels(newdata$Area.name) # there are 16 different area names in the newdata all in 
+# the state of Washington
+
+# Occupation titles
+head(levels(newdata$Occupational.title),20) # there are 756 occupation titles ranging from 
+# Accountant and Auditors to Zoologists and Wildlife Biologists. Only showing the first 20 to save space.
+
+
+```
+
+
+
+```{r}
+# Employment numbers
+max.employment <- newdata %>% filter(Employment == max(Employment))
+max.employment$Occupational.title
+# maximum employement number is 106,073 and the occupation title for this is Retail Salesperson.
+# avergae wage for this occupation that has the highest employement number is $17.79 an hour
+# with an annual wage of $36,988
+
+min.employment <- newdata %>% filter(Employment == min(Employment))
+min.employment$Occupational.title
+# minimum employment number is 10 with 16 different occupational titles which are; postal service
+# mail sorters, emergency management directors, Judges and Magistrates, Stationary Engineers,
+# judicial law clerks, Farm and Home management educators, Photographers, Financial and Investment
+# analysts, Financial Risk specialists, Broadcast Technicians, Purchasing managers, nuclear medicine technologists
+# Health and safety engineers, credit authorizers, editors, occupational therapy assistant, credit counselors.
+
+
+
+```
+
+
+
+```{r}
+# Average wage
+min.avgwage <- newdata %>% filter(Average.wage == min(Average.wage))
+
+min.avgwage$Average.wage # the minimum average wage is $10.6 an hour
+min.avgwage$Occupational.title # the occupation that has the smallest average was is bartender
+
+min.avgwage$Employment # the number of people employed that have the smallest average wage is 89 and are bartenders
+
+max.avgwage <- newdata %>% filter(Average.wage == max(Average.wage))
+
+max.avgwage$Average.wage # the maximum average wage is $94.5 an hour
+max.avgwage$Occupational.title # the occupation with the highest average wage is Nurse Anesthetists
+max.avgwage$Employment # the number of people employed that have the highest average wage is 624
+
+# Annual wage
+max.annualwage <- newdata %>% filter(Annual.wage == max(Annual.wage))
+
+max.annualwage$Annual.wage # the maximum annual wage is $196,568
+max.annualwage$Occupational.title # the occupation that has the highest annual wage is Nurse Anesthetists
+
+max.annualwage$Employment # the number of people employed with the highest annual wage is 624
+
+min.annualwage <- newdata %>% filter(Annual.wage == min(Annual.wage))
+
+min.annualwage$Annual.wage # the lowest annual wage is $22,043
+min.annualwage$Occupational.title # the occupation that has the lowest annual wage is Bartenders
+min.annualwage$Employment # the number of people employed with the lowest annual wage is 89
+
+
+
+```
+
+
+```{r}
+# Comparing employment and annual wage
+high.annual <- newdata %>% filter(Annual.wage >= 150000) #Annual wage is higher than $150,000
+plot(high.annual$Employment, high.annual$Annual.wage, xlab = "Employment Number", ylab = "Annual wage in $", main = "Employment vs Annual Wage Greater than $150,000")
+# talk about distribution between wage and employment number when annual wage is greater than 150,000
+
+low.annual <- newdata %>% filter(Annual.wage <= 28000) # Annual wage is lower than $28,000
+plot(low.annual$Employment, low.annual$Annual.wage, xlab = "Employment number", ylab = "Annual wage in $", main = "Employment vs Annual Wage Less than $28,000")
+# talk about distribution between wage and employment number when annual wage is less than 28,000
+
+```
+
+
+
+```{r}
+# Comparing Area and Employment numbers with plots
+area1 <- newdata %>% filter(Area.name %in% c("Bellingham, WA", "Bremerton-Silverdale, WA", "Eastern Washington nonmetropolitan area", "Kennewick-Richland, WA", "Lewiston, ID-WA"))
+ggplot(data = area1, aes(x = area1$Area.name, y = area1$Employment, col = area1$Area.name)) + 
+  geom_point() + labs(x = "Area Name", y = "Employment Number", title = "Area Name vs Employment Number", col = "Area Names")
+
+area2 <- newdata %>% filter(Area.name %in% c("Longview, WA", "Mount Vernon-Anacortes, WA", "Olympia-Tumwater, WA", "Portland-Vancouver-Hillsboro, OR-WA", "Seattle-Tacoma-Bellevue, WA"))
+ggplot(data = area2, aes(x = area2$Area.name, y = area2$Employment, col = area2$Area.name)) + 
+  geom_point() + labs(x = "Area Name", y = "Employment Number", title = "Area Name vs Employment Number", col = "Area Names")
+
+area3 <- newdata %>% filter(Area.name %in% c("Spokane-Spokane Valley, WA", "Walla Walla, WA","Wenatchee, WA", "Western Washington nonmetropolitan area", "Yakima, WA"))
+ggplot(data = area3, aes(x = area3$Area.name, y = area3$Employment, col = area3$Area.name)) + 
+  geom_point() + labs(x = "Area Name", y = "Employment Number", title = "Area Name vs Employment Number", col = "Area Names")
+
+# talk about distribution between areas and number of people employed
+
+```
+
+```{r}
+# Most reliable place to gain employemt
+# highest employment numbers from the graphs are from the areas "Spokane-Spokane Valley, WA" and Seattle-Tacoma-Bellevue, WA
+
+area.SSV <- newdata %>% filter(Area.name == "Spokane-Spokane Valley, WA")
+area.STB <- newdata %>% filter(Area.name == "Seattle-Tacoma-Bellevue, WA")
+
+sum(area.SSV$Employment) # total number of people employed in the Spokane-Spokane Valley, WA area is 219698
+sum(area.STB$Employment) # total number of people employed in the Seattle-Tacoma-Bellevue area is 1,896,626
+
+mean(area.SSV$Average.wage) # the mean of the average pay per hour in the Spokane-Spokane Valley, WA area is 28.22703
+mean(area.STB$Average.wage) # the mean of the average pay per hour in the Seattle-Tacoma-Bellevue area is 32.9287
+
+# Conclusion is that there is a higher chance of gaining employment in the Seattle-Tacoma-Bellevue, WA area as it has the most number of 
+# employed individuals and a good average wage across all employment titles.
+```
+
+
+```{r}
+
+```
+
