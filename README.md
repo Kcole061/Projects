@@ -1,3 +1,2 @@
 # Projects
-Various Project Files
-Various Projects that i have completed
+Various Project Files that i have completed
