@@ -1,2 +1,2 @@
 # Projects
-Various projects files that I have completed!
+Various Data Analyst/Science Projects that I have completed!
